@@ -1,0 +1,8 @@
+
+# fix offset
+e.g. 直接影响
+影响,type=word,startOffset=72,endOffset=74
+直接,type=word,startOffset=72,endOffset=74
+直接影响,type=word,startOffset=72,endOffset=76
+
+# support add unknown word to dict automatically
