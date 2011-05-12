@@ -50,6 +50,7 @@ public abstract class Cell {
   public boolean end;
   public int depth;
   public char[][] words = EMPTY_WORDS;
+  public String type;
   
   public Cell(char c) {
     this.c = c;
@@ -93,7 +94,7 @@ class ArrayCell extends Cell {
   private Cell[] children;
   
   public ArrayCell() {
-    this((char)0);
+    this((char) 0);
   }
   
   public ArrayCell(char c) {
@@ -270,6 +271,14 @@ class NormalCell extends Cell {
   private static CellMap EMPTY_CELL_MAP = new CellMap();
   private CellMap children = EMPTY_CELL_MAP;
   
+  public static NormalCell wordCell(String type, char c) {
+    NormalCell cell = new NormalCell(c);
+    cell.type = type;
+    cell.wordEnd = true;
+    cell.end = true;
+    return cell;
+  }
+  
   public NormalCell(char c) {
     super(c);
   }
@@ -288,6 +297,42 @@ class NormalCell extends Cell {
   
   public Iterable<Cell> children() {
     return children;
+  }
+  
+}
+
+class RangeCell extends NormalCell {
+  private static final char[][] EMPTY = new char[0][];
+  
+  private char[][] ranges = EMPTY;
+  
+  public RangeCell(char c) {
+    super(c);
+    this.wordEnd = true;
+  }
+  
+  public void addRange(char from, char to) {
+    char[][] newRanges = new char[ranges.length + 1][2];
+    System.arraycopy(ranges, 0, newRanges, 0, ranges.length);
+    char[] range = newRanges[ranges.length];
+    range[0] = from;
+    range[1] = to;
+    ranges = newRanges;
+  }
+  
+  public Cell child(char c) {
+    Cell cell = super.child(c);
+    if (cell != null) {
+      return cell;
+    }
+    
+    for (int i = 0; i < ranges.length; i++) {
+      char[] range = ranges[i];
+      if (c >= range[0] && c <= range[1]) {
+        return this;
+      }
+    }
+    return null;
   }
   
 }

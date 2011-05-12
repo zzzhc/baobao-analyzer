@@ -11,7 +11,6 @@ import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.apache.lucene.util.AttributeSource;
 
-
 /**
  * 1. 同义词 2. 数字，英语 3. ip/host/email ?
  * 
@@ -113,16 +112,24 @@ public class DictTokenizer extends Tokenizer {
     if (cellWordOffset > 0) {
       positionIncrementAtt.setPositionIncrement(0);
     }
-    char[][] words = matchCell.words;
-    char[] word = words[cellWordOffset++];
-    termAtt.copyBuffer(word, 0, word.length);
-    typeAtt.setType("word");
-    int start = offset - matchCell.depth;
-    offsetAtt.setOffset(start, start + word.length);
-    
-    if (cellWordOffset == words.length) {
+    typeAtt.setType(matchCell.type);
+    if (matchCell.type != "word") {
+      termAtt.copyBuffer(pending.buffer, 0, pending.length());
+      offsetAtt.setOffset(offset - pending.length(), offset);
       matchCell = null;
       cellWordOffset = 0;
+    } else {
+      char[][] words = matchCell.words;
+      char[] word = words[cellWordOffset++];
+      termAtt.copyBuffer(word, 0, word.length);
+      
+      int start = offset - matchCell.depth;
+      offsetAtt.setOffset(start, start + word.length);
+      
+      if (cellWordOffset == words.length) {
+        matchCell = null;
+        cellWordOffset = 0;
+      }
     }
     return true;
   }
@@ -167,6 +174,7 @@ public class DictTokenizer extends Tokenizer {
           }
         }
       } else {
+        pending.append(c);
         if (cell.end) {
           matchCell = cell;
           return fillAttributes();
@@ -175,7 +183,6 @@ public class DictTokenizer extends Tokenizer {
           matchCell = cell;
           reader.mark();
         } else {
-          pending.append(c);
           if (!hasPending) {
             hasPending = true;
             reader.mark();

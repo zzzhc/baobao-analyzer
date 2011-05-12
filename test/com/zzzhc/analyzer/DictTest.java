@@ -10,7 +10,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-
 public class DictTest {
   private String[] words;
   private Dict dict;
@@ -69,13 +68,65 @@ public class DictTest {
     List<String> result = new ArrayList<String>();
     for (String word : dict) {
       result.add(word);
-      System.out.println(word);
     }
     assertEquals(words.length, result.size());
-    System.out.println(result);
     for (String word : words) {
       assertTrue(result.contains(word));
     }
   }
   
+  @Test
+  public void testWhiteSpace() {
+    dict.addWhiteSpace();
+    for (int i = 0; i < 65536; i++) {
+      char c = (char) i;
+      if (Character.isWhitespace(c) || Character.isISOControl(c)) {
+        Cell cell = dict.root.child(c);
+        assertNotNull(cell);
+        assertEquals("whitespace", cell.type);
+      }
+    }
+  }
+  
+  @Test
+  public void testPunctuation() {
+    dict.addPunctuation();
+    for (int i = 0; i < 65536; i++) {
+      char c = (char) i;
+      int type = Character.getType(c);
+      if (type == Character.CONNECTOR_PUNCTUATION
+          || type == Character.DASH_PUNCTUATION
+          || type == Character.END_PUNCTUATION
+          || type == Character.START_PUNCTUATION
+          || type == Character.FINAL_QUOTE_PUNCTUATION
+          || type == Character.INITIAL_QUOTE_PUNCTUATION
+          || type == Character.OTHER_PUNCTUATION) {
+        Cell cell = dict.root.child(c);
+        assertNotNull(cell);
+        assertEquals("punctuation", cell.type);
+      }
+    }
+  }
+  
+  @Test
+  public void testNumber() {
+    dict.addNumber();
+    String[] words = {"1", "123", "111"};
+    for (String word : words) {
+      Cell cell = dict.lookup(word);
+      assertNotNull(cell);
+      assertEquals("number", cell.type);
+    }
+  }
+  
+  @Test
+  public void testEnglish() {
+    dict.addEnglish();
+    String[] words = {"a", "abc", "aaa", "zza", "chinese"};
+    for (String word : words) {
+      Cell cell = dict.lookup(word);
+      assertNotNull(cell);
+      assertEquals("english", cell.type);
+    }
+  }
 }
