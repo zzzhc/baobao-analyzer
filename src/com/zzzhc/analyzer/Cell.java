@@ -1,12 +1,13 @@
 package com.zzzhc.analyzer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 
 public abstract class Cell {
+  private final static char[] EMPTY_WORD = new char[0];
   private final static char[][] EMPTY_WORDS = new char[0][];
+  private final static int[] EMPTY_OFFSETS = new int[0];
   
   static class CharArrayComparator implements Comparator<char[]> {
     
@@ -17,28 +18,15 @@ public abstract class Cell {
       int len1 = v1.length;
       int len2 = v2.length;
       int n = Math.min(len1, len2);
-      int i = 0;
-      int j = 0;
-      
-      if (i == j) {
-        int k = i;
-        int lim = n + i;
-        while (k < lim) {
-          char c1 = v1[k];
-          char c2 = v2[k];
-          if (c1 != c2) {
-            return c1 - c2;
-          }
-          k++;
+      int k = 0;
+      int lim = n;
+      while (k < lim) {
+        char c1 = v1[k];
+        char c2 = v2[k];
+        if (c1 != c2) {
+          return c1 - c2;
         }
-      } else {
-        while (n-- != 0) {
-          char c1 = v1[i++];
-          char c2 = v2[j++];
-          if (c1 != c2) {
-            return c1 - c2;
-          }
-        }
+        k++;
       }
       return len1 - len2;
     }
@@ -49,7 +37,9 @@ public abstract class Cell {
   public boolean wordEnd;
   public boolean end;
   public int depth;
+  public char[] masterWord = EMPTY_WORD;
   public char[][] words = EMPTY_WORDS;
+  public int[] offsets = EMPTY_OFFSETS;
   public String type;
   
   public Cell(char c) {
@@ -58,14 +48,22 @@ public abstract class Cell {
   
   public void addWords(char[][] words) {
     for (char[] word : words) {
-      addWord(word);
+      addWord(word, 0);
     }
   }
   
-  public void addWord(char[] word) {
+  private boolean isWordExists(char[] word) {
     CharArrayComparator comparator = CharArrayComparator.instance;
-    int index = Arrays.binarySearch(words, word, comparator);
-    if (index >= 0) {
+    for (char[] w : words) {
+      if (comparator.compare(w, word) == 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  public void addWord(char[] word, int offset) {
+    if (isWordExists(word)) {
       return;
     }
     
@@ -73,8 +71,16 @@ public abstract class Cell {
     char[][] newWords = new char[len + 1][];
     System.arraycopy(words, 0, newWords, 0, len);
     newWords[len] = word;
-    Arrays.sort(newWords, comparator);
+    
+    int[] newOffsets = new int[len + 1];
+    System.arraycopy(offsets, 0, newOffsets, 0, len);
+    newOffsets[len] = offset;
+    
     words = newWords;
+    offsets = newOffsets;
+    if (word.length > masterWord.length) {
+      masterWord = word;
+    }
   }
   
   public abstract void addChild(Cell child);

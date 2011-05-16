@@ -2,7 +2,6 @@ package com.zzzhc.analyzer;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -120,12 +119,13 @@ public class DictTokenizer extends Tokenizer {
       cellWordOffset = 0;
     } else {
       char[][] words = matchCell.words;
-      char[] word = words[cellWordOffset++];
+      char[] word = words[cellWordOffset];
       termAtt.copyBuffer(word, 0, word.length);
       
-      int start = offset - matchCell.depth;
+      int start = offset - matchCell.depth + matchCell.offsets[cellWordOffset];
       offsetAtt.setOffset(start, start + word.length);
       
+      cellWordOffset++;
       if (cellWordOffset == words.length) {
         matchCell = null;
         cellWordOffset = 0;
@@ -194,28 +194,6 @@ public class DictTokenizer extends Tokenizer {
       unknown.append(pending);
     }
     return fillAttributes();
-  }
-  
-  public static void main(String[] args) throws IOException {
-    Dict dict = new Dict();
-    dict.addWord("中国");
-    dict.addWord("中国人");
-    dict.addWord("我们");
-    dict.addWord("一丁点");
-    dict.optimize();
-    Reader in = new StringReader("--一丁我们是abc中国123中国人");
-    DictTokenizer tokenizer = new DictTokenizer(in);
-    tokenizer.setDictionary(dict);
-    while (tokenizer.incrementToken()) {
-      CharTermAttribute term = tokenizer.getAttribute(CharTermAttribute.class);
-      OffsetAttribute offsetAtt = tokenizer.getAttribute(OffsetAttribute.class);
-      TypeAttribute typeAtt = tokenizer.getAttribute(TypeAttribute.class);
-      PositionIncrementAttribute position = tokenizer
-          .getAttribute(PositionIncrementAttribute.class);
-      
-      System.out.println(term + " " + offsetAtt + "," + typeAtt + " "
-          + position);
-    }
   }
   
 }

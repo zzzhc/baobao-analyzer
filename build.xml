@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<project name="baobao-analyzer" basedir="." default="dist">
+	<description>another chinese analyzer for lucene</description>
+
+	<property name="lib.dir" value="lib" />
+	<property name="src.dir" value="src" />
+	<property name="bin.dir" value="bin" />
+	<property name="test.dir" value="test" />
+	<property name="build.dir" value="build" />
+	<property name="report.dir" value="report" />
+	<property name="version" value="1.0" />
+
+	<path id="classpath">
+		<fileset dir="${lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+		<dirset dir="${build.dir}">
+		</dirset>
+	</path>
+
+	<target name="dist" depends="compile">
+		<jar destfile="${release.work.dir}/lib/baobao-analyzer-${version}.jar">
+			<fileset dir="${build.dir}">
+				<include name="**/*" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="compile" depends="init">
+		<javac srcdir="${src.dir}" debug="true" destdir="build" encoding="UTF-8" target="1.5" source="1.5">
+			<classpath refid="classpath" />
+		</javac>
+		<copy todir="${build.dir}">
+			<fileset dir="${src.dir}">
+				<include name="*.properties" />
+				<include name="*.xml" />
+				<include name="**/*.html" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="init" depends="clear">
+		<mkdir dir="${build.dir}" />
+	</target>
+
+	<target name="clear">
+		<delete dir="${build.dir}" failonerror="false" />
+		<delete dir="${report.dir}" failonerror="false" />
+	</target>
+
+	<target name="compile-test" depends="compile">
+		<javac srcdir="${test.dir}" debug="true" destdir="build" encoding="UTF-8" target="1.5" source="1.5">
+			<classpath refid="classpath" />
+		</javac>
+		<copy todir="${build.dir}">
+			<fileset dir="${test.dir}">
+				<include name="**/*" />
+				<exclude name="**/.svn/*" />
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="test" depends="compile-test">
+		<delete failonerror="false" dir="${report.dir}"/>
+		<delete failonerror="false" dir="data"/>
+		<delete failonerror="false" dir="testdata"/>
+		<mkdir dir="${report.dir}" />
+		<mkdir dir="data" />
+		<junit printsummary="true" errorproperty="junit.error">
+			<classpath refid="classpath" />
+			<formatter type="xml" />
+			<batchtest fork="yes" todir="${report.dir}">
+				<fileset dir="${test.dir}">
+					<include name="**/*Test*.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+		<junitreport todir="${report.dir}">
+			<fileset dir="${report.dir}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="frames" todir="${report.dir}/html" />
+		</junitreport>
+		<fail message="unittests failed">
+			<condition>
+				<isset property="junit.error" />
+			</condition>
+		</fail>
+	</target>
+</project>

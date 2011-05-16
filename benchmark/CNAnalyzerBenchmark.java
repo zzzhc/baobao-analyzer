@@ -33,7 +33,7 @@ public class CNAnalyzerBenchmark {
      */
 
     Dict dict = new Dict();
-    dict.addWhiteSpace();
+    dict.addAllSpecialTypes();
     BufferedReader dictReader = new BufferedReader(new InputStreamReader(
         new FileInputStream("dict.txt"), "UTF-8"));
     dict.load(dictReader);
@@ -49,7 +49,6 @@ public class CNAnalyzerBenchmark {
     dict.addWord("直接").addWord("影响").addWord("检索");
     dict.addWord("准确性");
     dict.optimize();
-    dict.addAllSpecialTypes();
     DictAnalyzer dictAnalyzer = new DictAnalyzer(dict);
     testAnalyzer(dictAnalyzer);
   }
@@ -58,7 +57,7 @@ public class CNAnalyzerBenchmark {
     String data = "中文(chinese)与西方语言最大的区别" + "就在于语句的词汇之间没有明显的分词界限，"
         + "但是计算机自然语言处理是按词汇来进行分析的，" + "因此中文分词的效果直接影响中文检索和自然语言处理的准确性。";
     StringBuilder ss = new StringBuilder();
-    for (int i = 0; i < 2000000; i++) {
+    for (int i = 0; i < 1000000; i++) {
       ss.append(data);
     }
     String s = ss.toString();

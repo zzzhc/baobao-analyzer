@@ -29,7 +29,7 @@ public class DictTokenizerTest {
     DictTokenizer tokenizer = new DictTokenizer(in);
     tokenizer.setDictionary(dict);
     
-    String[] expected = {"从 unknown 0-1 1", "明天 word 1-3 1", "明天起 word 1-4 0",
+    String[] expected = {"从 unknown 0-1 1", "明天起 word 1-4 1", "明天 word 1-3 0",
         ", word 4-5 1", "做 unknown 5-6 1", "一个 word 6-8 1", "幸福 word 8-10 1",
         "的人 unknown 10-12 1",};
     
@@ -50,8 +50,7 @@ public class DictTokenizerTest {
     DictTokenizer tokenizer = new DictTokenizer(in);
     tokenizer.setDictionary(dict);
     
-    String[] expected = {"从 unknown 0-1 1", 
-        "明天 word 1-3 1"};
+    String[] expected = {"从 unknown 0-1 1", "明天 word 1-3 1"};
     doTest(expected, tokenizer);
   }
   
@@ -69,9 +68,21 @@ public class DictTokenizerTest {
     doTest(expected, tokenizer);
     
     in = new StringReader("从明天开始");
-    expected = new String[]{"从明天 unknown 0-3 1", "从明 unknown 0-2 0",
-    "明天 unknown 1-3 0", "开始 word 3-5 1"};
-doTest(expected, tokenizer);
+    expected = new String[] {"从明天 unknown 0-3 1", "从明 unknown 0-2 0",
+        "明天 unknown 1-3 0", "开始 word 3-5 1"};
+    doTest(expected, tokenizer);
+  }
+  
+  @Test
+  public void testOffset() throws IOException {
+    Dict dict = new Dict();
+    dict.addWord("abcd").addWord("ab").addWord("bc").addWord("cd").optimize();
+    
+    Reader in = new StringReader("abcd");
+    DictTokenizer tokenizer = new DictTokenizer(in);
+    tokenizer.setDictionary(dict);
+    String[] expected = {"abcd word 0-4 1", "ab word 0-2 0", "bc word 1-3 0", "cd word 2-4 0"};
+    doTest(expected, tokenizer);
   }
   
   private void doTest(String[] expected, DictTokenizer tokenizer)

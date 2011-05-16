@@ -5,10 +5,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.zzzhc.analyzer.Cell.CharArrayComparator;
 
 public class DictTest {
   private String[] words;
@@ -56,6 +59,7 @@ public class DictTest {
     dict.optimize();
     Cell cell = dict.lookup("abcd");
     char[][] words = cell.words;
+    Arrays.sort(words, CharArrayComparator.instance);
     assertEquals(5, words.length);
     int i = 0;
     for (String word : "a ab abc abcd bc".split("\\s+")) {

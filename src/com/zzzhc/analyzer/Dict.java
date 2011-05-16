@@ -166,7 +166,6 @@ public class Dict implements Iterable<String> {
     char[][] words = new char[0][];
     StringBuilder word = new StringBuilder();
     optimize0(root, words, word);
-    
     optimize1(root);
     // TODO, repeat optimize1 ?
   }
@@ -174,8 +173,8 @@ public class Dict implements Iterable<String> {
   private void optimize0(Cell cell, char[][] words, StringBuilder word) {
     int len = word.length();
     if (cell.wordEnd) {
+      cell.addWord(word.toString().toCharArray(), 0);
       cell.addWords(words);
-      cell.addWord(word.toString().toCharArray());
       words = cell.words;
     }
     for (Cell child : cell.children()) {
@@ -189,18 +188,25 @@ public class Dict implements Iterable<String> {
     if (cell.end) {
       char[][] words = cell.words;
       if (words.length > 0) {
-        char[] word = words[words.length - 1];
+        char[] word = cell.masterWord;
         int len = word.length;
         for (int i = 1; i < len; i++) {
           Cell result = lookup(word, i, len);
           if (result != null && result.wordEnd) {
-            cell.addWords(result.words);
+            addInternalWords(cell, result, i);
           }
         }
       }
     }
     for (Cell child : cell.children()) {
       optimize1(child);
+    }
+  }
+  
+  private void addInternalWords(Cell cell, Cell internalCell, int offset) {
+    char[][] words = internalCell.words;
+    for (int i = 0; i < words.length; i++) {
+      cell.addWord(words[i], offset + internalCell.offsets[i]);
     }
   }
   
