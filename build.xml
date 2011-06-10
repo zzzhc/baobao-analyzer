@@ -6,7 +6,9 @@
 	<property name="src.dir" value="src" />
 	<property name="bin.dir" value="bin" />
 	<property name="test.dir" value="test" />
+	<property name="benchmark.dir" value="benchmark" />
 	<property name="build.dir" value="build" />
+	<property name="dist.dir" value="dist" />
 	<property name="report.dir" value="report" />
 	<property name="version" value="1.0" />
 
@@ -17,9 +19,18 @@
 		<dirset dir="${build.dir}">
 		</dirset>
 	</path>
+	
+	<path id="banchmark-classpath">
+		<dirset dir="${benchmark.dir}">
+		</dirset>
+		<fileset dir="${benchmark.dir}/3rd">
+			<include name="*.jar" />
+		</fileset>
+	</path>
 
 	<target name="dist" depends="compile">
-		<jar destfile="${release.work.dir}/lib/baobao-analyzer-${version}.jar">
+		<mkdir dir="${dist.dir}"/>
+		<jar destfile="${dist.dir}/baobao-analyzer-${version}.jar">
 			<fileset dir="${build.dir}">
 				<include name="**/*" />
 			</fileset>
@@ -59,6 +70,17 @@
 				<exclude name="**/*.java" />
 			</fileset>
 		</copy>
+	</target>
+	
+	<target name="benchmark" depends="compile">
+		<javac srcdir="${benchmark.dir}" debug="true" destdir="build" encoding="UTF-8" target="1.5" source="1.5">
+			<classpath refid="classpath" />
+			<classpath refid="banchmark-classpath" />
+		</javac>
+		<java classname="com.zzzhc.tools.CNAnalyzerBenchmark">
+			<classpath refid="classpath" />
+			<classpath refid="banchmark-classpath" />
+		</java>
 	</target>
 
 	<target name="test" depends="compile-test">

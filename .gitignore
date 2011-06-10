@@ -1,3 +1,7 @@
 classes
 build
+dist
 report
+/nbproject/private/
+/.settings/
+/nbbuild/

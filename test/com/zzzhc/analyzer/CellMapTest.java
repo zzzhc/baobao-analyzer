@@ -46,4 +46,13 @@ public class CellMapTest {
     }
   }
   
+  @Test
+  public void testConflict() {
+    for (int i = 0; i < 6; i++) {
+      map.add(new NormalCell((char) i));
+    }
+    for (int i = 0; i < 6; i++) {
+      assertNotNull(map.get((char) i));
+    }
+  }
 }

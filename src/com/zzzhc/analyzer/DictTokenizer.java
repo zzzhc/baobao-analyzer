@@ -74,7 +74,7 @@ public class DictTokenizer extends Tokenizer {
   private Cell matchCell;
   private int cellWordOffset;
   
-  boolean fillAttributes() {
+  final boolean fillAttributes() {
     int len = unknown.length();
     if (len > 0) {
       if (unknownOffset >= 0) {
@@ -134,7 +134,7 @@ public class DictTokenizer extends Tokenizer {
     return true;
   }
   
-  boolean moveToNextToken() throws IOException {
+  final boolean moveToNextToken() throws IOException {
     if (fillAttributes()) {
       return true;
     }
@@ -164,6 +164,7 @@ public class DictTokenizer extends Tokenizer {
             hasPending = false;
             unknown.append(pending.buffer[0]);
             reader.reset();
+            pending.reset();
             continue;
           }
           unknown.append(c);

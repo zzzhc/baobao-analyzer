@@ -133,4 +133,45 @@ public class DictTest {
       assertEquals("english", cell.type);
     }
   }
+  
+  @Test
+  public void testOO() {
+    String s = "督令\n" + 
+    "督促\n" + 
+    "督促检查\n" + 
+    "督俞\n" + 
+    "督军\n" + 
+    "督办\n" + 
+    "督学\n" + 
+    "督察\n" + 
+    "督导\n" + 
+    "督工\n" + 
+    "督师\n" + 
+    "督府\n" + 
+    "督战\n" + 
+    "督托\n" + 
+    "督抚\n" + 
+    "督率\n" + 
+    "督理\n" + 
+    "督署\n" + 
+    "督考\n" + 
+    "督脉\n" + 
+    "督课\n" + 
+    "督责\n" + 
+    "督造\n" + 
+    "督阵\n" + 
+    "督饬\n";
+    for (String word : s.split("\n")) {
+      dict.addWord(word);
+    }
+    dict.optimize();
+    for (String word : dict) {
+      System.out.println(word);
+    }
+    Cell cell = dict.lookup("督促");
+    for (Cell c : cell.children()) {
+      System.out.println("char: " + c.c);
+    }
+    System.out.println(cell);
+  }
 }

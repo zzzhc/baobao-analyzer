@@ -95,7 +95,7 @@ public abstract class Cell {
   
 }
 
-class ArrayCell extends Cell {
+final class ArrayCell extends Cell {
   
   private Cell[] children;
   
@@ -127,7 +127,7 @@ class ArrayCell extends Cell {
   }
 }
 
-class CellMap implements Iterable<Cell> {
+final class CellMap implements Iterable<Cell> {
   final static int MAXIMUM_CAPACITY = 1 << 15;
   
   static class Entry {
@@ -149,7 +149,7 @@ class CellMap implements Iterable<Cell> {
   
   private Entry[] table;
   private int size;
-  private int threshold;
+  private int threshold = 1;
   private float loadFactor = 0.75f;
   
   public CellMap() {
@@ -168,7 +168,7 @@ class CellMap implements Iterable<Cell> {
     }
     
     Entry newEntry = new Entry(cell);
-    newEntry.next = e;
+    newEntry.next = table[i];
     table[i] = newEntry;
     
     size++;

@@ -4,11 +4,11 @@ import java.io.Reader;
 
 import org.apache.lucene.analysis.ReusableAnalyzerBase;
 
-public class DictAnalyzer extends ReusableAnalyzerBase {
+public class BaoBaoAnalyzer extends ReusableAnalyzerBase {
   
   private Dict dict;
   
-  public DictAnalyzer(Dict dict) {
+  public BaoBaoAnalyzer(Dict dict) {
     this.dict = dict;
   }
   

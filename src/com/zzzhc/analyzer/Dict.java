@@ -3,6 +3,7 @@ package com.zzzhc.analyzer;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Stack;
 
@@ -20,10 +21,15 @@ public class Dict implements Iterable<String> {
   }
   
   public Dict addWord(String word) {
+    return addWord(word, "word");
+  }
+  
+  public Dict addWord(String word, String type) {
     int len = word.length();
     if (len == 0) {
       return this;
     }
+    type = type.intern();
     
     char[] chars = word.toCharArray();
     Cell cell = root;
@@ -45,7 +51,7 @@ public class Dict implements Iterable<String> {
       size++;
       optimized = false;
       cell.wordEnd = true;
-      cell.type = "word";
+      cell.type = type;
     }
     if (!exists) {
       cell.end = true;
@@ -138,11 +144,21 @@ public class Dict implements Iterable<String> {
     return this;
   }
   
+  public Dict addStopWords(Collection<String> words) {
+    for (String word : words) {
+      addWord(word, "stop");
+    }
+    return this;
+  }
+  
   public Cell lookup(String word) {
     return lookup(word.toCharArray(), 0, word.length());
   }
   
   public Cell lookup(char[] word, int offset, int len) {
+    if (word.length == 0) {
+      return null;
+    }
     return lookup0(root, word, offset, len);
   }
   

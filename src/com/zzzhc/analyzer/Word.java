@@ -1,8 +1,8 @@
 package com.zzzhc.analyzer;
 
-class Word {
+final class Word {
   
-  public char[] buffer;
+  public final char[] buffer;
   private int length;
   
   public Word(int maxSize) {
