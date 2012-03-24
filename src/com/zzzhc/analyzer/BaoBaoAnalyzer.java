@@ -15,7 +15,7 @@ public class BaoBaoAnalyzer extends ReusableAnalyzerBase {
   protected TokenStreamComponents createComponents(String fieldName,
       Reader reader) {
     final DictTokenizer source = new DictTokenizer(reader);
-    source.setDictionary(dict);
+    source.setDict(dict);
     return new TokenStreamComponents(source);
   }
 }

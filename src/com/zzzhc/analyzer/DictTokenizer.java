@@ -25,7 +25,7 @@ public class DictTokenizer extends Tokenizer {
   private TypeAttribute typeAtt;
   private PositionIncrementAttribute positionIncrementAtt;
   
-  public void setDictionary(Dict dict) {
+  public void setDict(Dict dict) {
     this.dict = dict;
   }
   

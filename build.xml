@@ -77,7 +77,8 @@
 			<classpath refid="classpath" />
 			<classpath refid="banchmark-classpath" />
 		</javac>
-		<java classname="com.zzzhc.tools.CNAnalyzerBenchmark">
+		<java classname="com.zzzhc.tools.CNAnalyzerBenchmark" fork="true">
+			<jvmarg line="-Xmx256M"/>
 			<classpath refid="classpath" />
 			<classpath refid="banchmark-classpath" />
 		</java>

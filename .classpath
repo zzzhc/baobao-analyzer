@@ -4,11 +4,13 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="src" path="benchmark"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
-	<classpathentry kind="lib" path="lib/lucene-core-3.1.0.jar" sourcepath="/lucene-3.1.0/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="benchmark/3rd/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="lib" path="benchmark/3rd/IKAnalyzer3.2.8.jar"/>
 	<classpathentry kind="lib" path="benchmark/3rd/mmseg4j-all-1.8.4-with-dic.jar"/>
 	<classpathentry kind="lib" path="benchmark/3rd/paoding-analysis.jar"/>
+	<classpathentry kind="lib" path="lib/apache-solr-core-3.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-core-3.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
