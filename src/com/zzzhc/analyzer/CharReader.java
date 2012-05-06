@@ -111,4 +111,8 @@ final class CharReader {
     return offset;
   }
   
+  public final boolean eof() {
+  		return eof;
+  }
+  
 }

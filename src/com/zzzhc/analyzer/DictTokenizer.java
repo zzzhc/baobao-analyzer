@@ -149,6 +149,10 @@ public class DictTokenizer extends Tokenizer {
     for (;;) {
       i = reader.read();
       if (i == CharReader.EOF) {
+      		if (hasWord) {
+      			reader.reset();
+      			return fillAttributes();
+      		}
         break;
       }
       
