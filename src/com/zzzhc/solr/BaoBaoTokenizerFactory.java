@@ -3,17 +3,19 @@ package com.zzzhc.solr;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Tokenizer;
-import org.apache.solr.analysis.BaseTokenizerFactory;
-import org.apache.solr.analysis.TokenizerFactory;
+import org.apache.lucene.analysis.util.TokenizerFactory;
+import org.apache.lucene.util.AttributeSource.AttributeFactory;
 
 import com.zzzhc.analyzer.Dict;
 import com.zzzhc.analyzer.DictTokenizer;
 
-public class BaoBaoTokenizerFactory extends BaseTokenizerFactory implements
-		TokenizerFactory {
+public class BaoBaoTokenizerFactory extends TokenizerFactory {
+
+	private static Map<String, Dict> sharedDicts = new HashMap<String, Dict>();
 
 	private Dict dict;
 
@@ -21,16 +23,19 @@ public class BaoBaoTokenizerFactory extends BaseTokenizerFactory implements
 		return dict;
 	}
 
-	@Override
-	public Tokenizer create(Reader input) {
-		DictTokenizer tokenizer = new DictTokenizer(input);
-		tokenizer.setDict(dict);
-		return tokenizer;
+	public BaoBaoTokenizerFactory(Map<String, String> args) {
+		super(args);
+		synchronized (BaoBaoTokenizerFactory.class) {
+			String dictFile = args.get("dictFile");
+			if (sharedDicts.containsKey(dictFile)) {
+				dict = sharedDicts.get(dictFile);
+			} else {
+				loadDict(args);
+			}
+		}
 	}
 
-	@Override
-	public void init(Map<String, String> args) {
-		super.init(args);
+	private void loadDict(Map<String, String> args) {
 		String dictFile = args.get("dictFile");
 		String encoding = "UTF-8";
 		if (args.containsKey("encoding")) {
@@ -41,7 +46,7 @@ public class BaoBaoTokenizerFactory extends BaseTokenizerFactory implements
 		dict.addAllSpecialTypes();
 		try {
 			if (dictFile == null) {
-				log.error("dictFile is required!!");
+				throw new RuntimeException("dictFile is required!!");
 			} else {
 				loadFiles(dictFile, Dict.NORMAL_TYPE, encoding);
 			}
@@ -52,8 +57,9 @@ public class BaoBaoTokenizerFactory extends BaseTokenizerFactory implements
 				loadFiles(stopwordFile, Dict.STOPWORD_TYPE, encoding);
 			}
 		} catch (Exception e) {
-			log.error("load dict failed", e);
+			throw new RuntimeException("load dict failed", e);
 		}
+		sharedDicts.put(dictFile, dict);
 	}
 
 	private void loadFiles(String filePath, String type, String encoding)
@@ -67,14 +73,20 @@ public class BaoBaoTokenizerFactory extends BaseTokenizerFactory implements
 			throws IOException {
 		File file = new File(filePath);
 		if (!file.exists()) {
-			log.error("file(" + filePath + ") doesn't exist");
-			return;
+			throw new RuntimeException("file(" + filePath + ") doesn't exist");
 		}
 		if (!file.isFile()) {
-			log.error("file(" + filePath + ") is not a regular file");
-			return;
+			throw new RuntimeException("file(" + filePath
+					+ ") is not a regular file");
 		}
 		dict.loadFromFile(file, type, encoding);
+	}
+
+	@Override
+	public Tokenizer create(AttributeFactory factory, Reader input) {
+		DictTokenizer tokenizer = new DictTokenizer(factory, input);
+		tokenizer.setDict(dict);
+		return tokenizer;
 	}
 
 }

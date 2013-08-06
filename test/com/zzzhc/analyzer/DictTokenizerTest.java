@@ -38,7 +38,8 @@ public class DictTokenizerTest {
 		doTest(expected, tokenizer);
 
 		for (int i = 0; i < 3; i++) {
-			tokenizer.reset(new StringReader(input));
+			tokenizer.reset();
+			tokenizer.setReader(new StringReader(input));
 			doTest(expected, tokenizer);
 		}
 	}

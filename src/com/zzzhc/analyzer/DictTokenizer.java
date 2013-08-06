@@ -8,7 +8,6 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
-import org.apache.lucene.util.AttributeSource;
 
 /**
  * 1. 同义词 2. 数字，英语 3. ip/host/email ?
@@ -34,11 +33,6 @@ public class DictTokenizer extends Tokenizer {
     init();
   }
   
-  public DictTokenizer(AttributeSource source, Reader in) {
-    super(source, in);
-    init();
-  }
-  
   public DictTokenizer(AttributeFactory factory, Reader in) {
     super(factory, in);
     init();
@@ -52,9 +46,8 @@ public class DictTokenizer extends Tokenizer {
     positionIncrementAtt = addAttribute(PositionIncrementAttribute.class);
   }
   
-  public void reset(Reader in) throws IOException {
-    super.reset(in);
-    reader.setReader(in);
+  public void reset() throws IOException {
+    super.reset();
     unknown.reset();
     unknownOffset = -1;
     matchCell = null;

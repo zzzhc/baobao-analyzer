@@ -20,10 +20,9 @@ public class BaoBaoTokenizerFactoryTest {
 		args.put("encoding", "UTF-8");
 		args.put("stopwordFile", "benchmark/stopword.txt");
 
-		BaoBaoTokenizerFactory factory = new BaoBaoTokenizerFactory();
-		factory.init(args);
+		BaoBaoTokenizerFactory factory = new BaoBaoTokenizerFactory(args);
 		assertNotNull(factory.getDict());
-		assertEquals(args, factory.getArgs());
+		assertEquals(args, factory.getOriginalArgs());
 
 		StringReader input = new StringReader("一一列举");
 		Tokenizer tokenizer = factory.create(input);

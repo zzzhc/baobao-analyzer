@@ -10,7 +10,7 @@
 	<property name="build.dir" value="build" />
 	<property name="dist.dir" value="dist" />
 	<property name="report.dir" value="report" />
-	<property name="version" value="1.0" />
+	<property name="version" value="2.0" />
 
 	<path id="classpath">
 		<fileset dir="${lib.dir}">
