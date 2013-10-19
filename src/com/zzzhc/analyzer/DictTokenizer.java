@@ -19,10 +19,10 @@ public class DictTokenizer extends Tokenizer {
   private Dict dict;
   private CharReader reader;
   
-  private CharTermAttribute termAtt;
-  private OffsetAttribute offsetAtt;
-  private TypeAttribute typeAtt;
-  private PositionIncrementAttribute positionIncrementAtt;
+  private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);;
+  private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
+  private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
+  private final PositionIncrementAttribute positionIncrementAtt= addAttribute(PositionIncrementAttribute.class);
   
   public void setDict(Dict dict) {
     this.dict = dict;
@@ -30,31 +30,32 @@ public class DictTokenizer extends Tokenizer {
   
   public DictTokenizer(Reader in) {
     super(in);
-    init();
   }
   
   public DictTokenizer(AttributeFactory factory, Reader in) {
     super(factory, in);
-    init();
   }
   
-  private void init() {
-    reader = new CharReader(input);
-    termAtt = addAttribute(CharTermAttribute.class);
-    offsetAtt = addAttribute(OffsetAttribute.class);
-    typeAtt = addAttribute(TypeAttribute.class);
-    positionIncrementAtt = addAttribute(PositionIncrementAttribute.class);
+  public void end() {
+	  reader = null;
   }
   
   public void reset() throws IOException {
     super.reset();
+    
     unknown.reset();
     unknownOffset = -1;
     matchCell = null;
     cellWordOffset = 0;
+    
+    //offsetAtt.setOffset(0, 0);
+    //positionIncrementAtt.setPositionIncrement(0);
   }
   
   public boolean incrementToken() throws IOException {
+    if (reader == null) {
+	  reader = new CharReader(input);
+    }
     clearAttributes();
     return moveToNextToken();
   }
@@ -75,7 +76,11 @@ public class DictTokenizer extends Tokenizer {
       }
       int offset = reader.offset();
       if (matchCell != null) {
-        offset -= matchCell.depth;
+    	  if (matchCell.type == "word") {
+    		  offset -= matchCell.depth;
+    	  } else {
+    		  offset -= pending.length();
+    	  }
       }
       
       if (unknownOffset == -1) {

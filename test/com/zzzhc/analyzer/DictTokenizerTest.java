@@ -3,19 +3,51 @@ package com.zzzhc.analyzer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.Token.TokenAttributeFactory;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldType;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.FieldInfo.IndexOptions;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.util.Version;
 import org.junit.Test;
 
 public class DictTokenizerTest {
+
+	@Test
+	public void testRangeCellOffset() throws Exception {
+		Dict dict = new Dict();
+		dict.addNumber();
+
+		Reader in = new StringReader("月15");
+		DictTokenizer tokenizer = new DictTokenizer(in);
+		tokenizer.setDict(dict);
+
+		String[] expected = { "月 unknown 0-1 1", "15 number 1-3 1" };
+		doTest(expected, tokenizer);
+
+		tokenizer.reset();
+		tokenizer.setReader(new StringReader("日月年15"));
+		expected = new String[] { "日月 unknown 0-2 1", "月年 unknown 1-3 1",
+				"15 number 3-5 1" };
+		doTest(expected, tokenizer);
+	}
 
 	@Test
 	public void testIncrementToken() throws IOException {
@@ -31,9 +63,9 @@ public class DictTokenizerTest {
 		DictTokenizer tokenizer = new DictTokenizer(in);
 		tokenizer.setDict(dict);
 
-		String[] expected = { "从 unknown 0-1 1", "明天起 word 1-4 1", "明天 word 1-3 0",
-				", word 4-5 1", "做 unknown 5-6 1", "一个 word 6-8 1", "幸福 word 8-10 1",
-				"的人 unknown 10-12 1", };
+		String[] expected = { "从 unknown 0-1 1", "明天起 word 1-4 1",
+				"明天 word 1-3 0", ", word 4-5 1", "做 unknown 5-6 1",
+				"一个 word 6-8 1", "幸福 word 8-10 1", "的人 unknown 10-12 1", };
 
 		doTest(expected, tokenizer);
 
@@ -79,13 +111,14 @@ public class DictTokenizerTest {
 	@Test
 	public void testOffset() throws IOException {
 		Dict dict = new Dict();
-		dict.addWord("abcd").addWord("ab").addWord("bc").addWord("cd").optimize();
+		dict.addWord("abcd").addWord("ab").addWord("bc").addWord("cd")
+				.optimize();
 
 		Reader in = new StringReader("abcd");
 		DictTokenizer tokenizer = new DictTokenizer(in);
 		tokenizer.setDict(dict);
-		String[] expected = { "abcd word 0-4 1", "ab word 0-2 0", "bc word 1-3 0",
-				"cd word 2-4 0" };
+		String[] expected = { "abcd word 0-4 1", "ab word 0-2 0",
+				"bc word 1-3 0", "cd word 2-4 0" };
 		doTest(expected, tokenizer);
 	}
 
@@ -96,13 +129,14 @@ public class DictTokenizerTest {
 		Reader in = new StringReader("simple");
 		DictTokenizer tokenizer = new DictTokenizer(in);
 		tokenizer.setDict(dict);
-		String[] expected = { "simple english 0-6 1"};
+		String[] expected = { "simple english 0-6 1" };
 		doTest(expected, tokenizer);
 	}
 
 	@SuppressWarnings("unused")
 	private List<String> tokens(DictTokenizer tokenizer) throws IOException {
-		CharTermAttribute termAtt = tokenizer.getAttribute(CharTermAttribute.class);
+		CharTermAttribute termAtt = tokenizer
+				.getAttribute(CharTermAttribute.class);
 		List<String> result = new ArrayList<String>();
 		while (tokenizer.incrementToken()) {
 			String term = new String(termAtt.buffer(), 0, termAtt.length());
@@ -113,8 +147,10 @@ public class DictTokenizerTest {
 
 	private void doTest(String[] expected, DictTokenizer tokenizer)
 			throws IOException {
-		CharTermAttribute termAtt = tokenizer.getAttribute(CharTermAttribute.class);
-		OffsetAttribute offsetAtt = tokenizer.getAttribute(OffsetAttribute.class);
+		CharTermAttribute termAtt = tokenizer
+				.getAttribute(CharTermAttribute.class);
+		OffsetAttribute offsetAtt = tokenizer
+				.getAttribute(OffsetAttribute.class);
 		TypeAttribute typeAtt = tokenizer.getAttribute(TypeAttribute.class);
 		PositionIncrementAttribute positionAtt = tokenizer
 				.getAttribute(PositionIncrementAttribute.class);
@@ -125,7 +161,8 @@ public class DictTokenizerTest {
 			String[] ss = one.split("\\s+");
 
 			String term = ss[0];
-			assertEquals(term, new String(termAtt.buffer(), 0, termAtt.length()));
+			assertEquals(term,
+					new String(termAtt.buffer(), 0, termAtt.length()));
 
 			String type = ss[1];
 			assertEquals(type, typeAtt.type());
